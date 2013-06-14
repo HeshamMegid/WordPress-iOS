@@ -13,6 +13,8 @@
 - (bool)isEmpty;
 - (NSString *)trim;
 - (NSNumber *)numericValue;
+- (NSString *)mergeDiffsWithString:(NSString *)stringToMerge;
+
 
 @end
 

@@ -6,6 +6,7 @@
 //
 
 #import "NSString+Util.h"
+#import <DiffMatchPatch/DiffMatchPatch.h>
 
 
 @implementation NSString (Util)
@@ -21,6 +22,25 @@
 
 - (NSNumber *)numericValue {
     return [NSNumber numberWithUnsignedLongLong:[self longLongValue]];
+}
+
+- (NSString *)mergeDiffsWithString:(NSString *)stringToMerge {
+    DiffMatchPatch *dmp = [[DiffMatchPatch alloc] init];
+    // Represent each line by a single unicode character
+    NSMutableArray *tempDiffs = [[dmp diff_linesToCharsForFirstString:self andSecondString:stringToMerge] mutableCopy];
+    // Do the diff
+    NSMutableArray *diffs = [dmp diff_mainOfOldString:tempDiffs[0] andNewString:tempDiffs[1] checkLines:NO];
+    // Replace the Unicode characters with the original lines
+    [dmp diff_chars:diffs toLines:tempDiffs[2]];
+    
+    // Construct a new string based on the diffs
+    NSMutableString *newString = [[NSMutableString alloc] initWithString:@""];
+    
+    for (Diff *diff in diffs) {
+        [newString appendString:diff.text];
+    }
+    
+    return newString;
 }
 
 @end
