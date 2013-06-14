@@ -79,6 +79,13 @@
  */
 - (void)updateFromDictionary:(NSDictionary *)postInfo;
 
+/**
+ Same as `updateFromDictionary:` but with optional merging on the post contents
+ 
+ @param mergeContent If YES, content from dictionary will be merged with current content.
+ */
+- (void )updateFromDictionary:(NSDictionary *)postInfo mergeContent:(BOOL)mergeContent;
+
 ///------------------------
 /// @name Remote management
 ///------------------------

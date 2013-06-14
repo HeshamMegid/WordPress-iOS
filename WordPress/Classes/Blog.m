@@ -865,6 +865,9 @@
         if (newPost.remoteStatus == AbstractPostRemoteStatusSync) {
             [newPost updateFromDictionary:postInfo];
         }
+        else if (newPost.remoteStatus == AbstractPostRemoteStatusFailed) {
+            newPost.content = [newPost.content mergeDiffsWithString:[postInfo objectForKey:@"description"]];
+        }
         [postsToKeep addObject:newPost];
     }
 

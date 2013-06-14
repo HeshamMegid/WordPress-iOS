@@ -30,6 +30,7 @@
 - (NSDictionary *)XMLRPCDictionary;
 - (void)postPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure;
 - (void)getPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure;
+- (void)getPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure mergeContent:(BOOL)mergeContent;
 - (void)editPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure;
 - (void)deletePostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure;
 @end
@@ -98,17 +99,21 @@
     return self;
 }
 
-
-- (void )updateFromDictionary:(NSDictionary *)postInfo {
+- (void )updateFromDictionary:(NSDictionary *)postInfo mergeContent:(BOOL)mergeContent {
     self.postTitle      = [postInfo objectForKey:@"title"];
 	//keep attention: getPosts and getPost returning IDs in different types
 	if ([[postInfo objectForKey:@"postid"] isKindOfClass:[NSString class]]) {
-	  self.postID         = [[postInfo objectForKey:@"postid"] numericValue];
+        self.postID         = [[postInfo objectForKey:@"postid"] numericValue];
 	} else {
-	  self.postID         = [postInfo objectForKey:@"postid"];
+        self.postID         = [postInfo objectForKey:@"postid"];
 	}
-      
-	self.content        = [postInfo objectForKey:@"description"];
+    
+    // Merge only if the post on the server has a more recent date than the local one
+    if (mergeContent && [self.date_created_gmt compare:[postInfo objectForKey:@"date_created_gmt"]] == NSOrderedAscending)
+        self.content = [self.content mergeDiffsWithString:[postInfo objectForKey:@"description"]];
+    else if (!mergeContent)
+        self.content = [postInfo objectForKey:@"description"];
+        
     if ([[postInfo objectForKey:@"date_created_gmt"] isKindOfClass:[NSDate class]]) {
         self.date_created_gmt    = [postInfo objectForKey:@"date_created_gmt"];
     } else {
@@ -142,7 +147,7 @@
     if ([postInfo objectForKey:@"categories"]) {
         [self setCategoriesFromNames:[postInfo objectForKey:@"categories"]];
     }
-
+    
 	self.latitudeID = nil;
 	self.longitudeID = nil;
 	self.publicID = nil;
@@ -158,7 +163,7 @@
 			NSString *ID = [customField objectForKey:@"id"];
 			NSString *key = [customField objectForKey:@"key"];
 			NSString *value = [customField objectForKey:@"value"];
-
+            
 			if (key) {
 				if ([key isEqualToString:@"geo_longitude"]) {
 					geo_longitude = value;
@@ -184,6 +189,10 @@
 		}
 	}
 	return;   
+}
+
+- (void )updateFromDictionary:(NSDictionary *)postInfo {
+    [self updateFromDictionary:postInfo mergeContent:NO];
 }
 
 - (NSString *)categoriesText {
@@ -421,6 +430,10 @@
 }
 
 - (void)getPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure {
+    [self getPostWithSuccess:success failure:failure mergeContent:NO];
+}
+
+- (void)getPostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure mergeContent:(BOOL)mergeContent {
     WPFLogMethod();
     NSArray *parameters = [NSArray arrayWithObjects:self.postID, self.blog.username, [self.blog fetchPassword], nil];
     [self.blog.api callMethod:@"metaWeblog.getPost"
@@ -428,8 +441,8 @@
                       success:^(AFHTTPRequestOperation *operation, id responseObject) {
                           if ([self isDeleted] || self.managedObjectContext == nil)
                               return;
-
-                          [self updateFromDictionary:responseObject];
+                          
+                          [self updateFromDictionary:responseObject mergeContent:mergeContent];
                           [self save];
                           if (success) success();
                       } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -449,33 +462,35 @@
         }
         return;
     }
-
-    NSArray *parameters = [NSArray arrayWithObjects:self.postID, self.blog.username, [self.blog fetchPassword], [self XMLRPCDictionary], nil];
-    self.remoteStatus = AbstractPostRemoteStatusPushing;
     
-    if( self.isFeaturedImageChanged == NO ) {
-        NSMutableDictionary *xmlrpcDictionary = (NSMutableDictionary*) [parameters objectAtIndex:3] ;
-        [xmlrpcDictionary removeObjectForKey:@"wp_post_thumbnail"];
-    }
-    
-    [self.blog.api callMethod:@"metaWeblog.editPost"
-                   parameters:parameters
-                      success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                          if ([self isDeleted] || self.managedObjectContext == nil)
-                              return;
-
-                          self.remoteStatus = AbstractPostRemoteStatusSync;
-                          [self getPostWithSuccess:nil failure:nil];
-                          if (success) success();
-                          [[NSNotificationCenter defaultCenter] postNotificationName:@"PostUploaded" object:self];
-                      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                          if ([self isDeleted] || self.managedObjectContext == nil)
-                              return;
-
-                          self.remoteStatus = AbstractPostRemoteStatusFailed;
-                          if (failure) failure(error);
-                          [[NSNotificationCenter defaultCenter] postNotificationName:@"PostUploadFailed" object:self];
-                      }];
+    [self getPostWithSuccess:^{
+        NSArray *parameters = [NSArray arrayWithObjects:self.postID, self.blog.username, [self.blog fetchPassword], [self XMLRPCDictionary], nil];
+        self.remoteStatus = AbstractPostRemoteStatusPushing;
+        
+        if( self.isFeaturedImageChanged == NO ) {
+            NSMutableDictionary *xmlrpcDictionary = (NSMutableDictionary*) [parameters objectAtIndex:3] ;
+            [xmlrpcDictionary removeObjectForKey:@"wp_post_thumbnail"];
+        }
+        
+        [self.blog.api callMethod:@"metaWeblog.editPost"
+                       parameters:parameters
+                          success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                              if ([self isDeleted] || self.managedObjectContext == nil)
+                                  return;
+                              
+                              self.remoteStatus = AbstractPostRemoteStatusSync;
+                              [self getPostWithSuccess:nil failure:nil mergeContent:NO];
+                              if (success) success();
+                              [[NSNotificationCenter defaultCenter] postNotificationName:@"PostUploaded" object:self];
+                          } failure:nil];
+    } failure:^(NSError *error) {
+        if ([self isDeleted] || self.managedObjectContext == nil)
+            return;
+        
+        self.remoteStatus = AbstractPostRemoteStatusFailed;
+        if (failure) failure(error);
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"PostUploadFailed" object:self];
+    } mergeContent:YES];
 }
 
 - (void)deletePostWithSuccess:(void (^)())success failure:(void (^)(NSError *error))failure {
