@@ -281,6 +281,7 @@
 		45F285DB1149BD020014D36C /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 45F285D81149BD020014D36C /* Icon-72.png */; };
 		45F285DD1149BD020014D36C /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 45F285DA1149BD020014D36C /* Icon.png */; };
 		45F45B3611614BA50022D394 /* CPopoverManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45F45B3511614BA50022D394 /* CPopoverManager.m */; };
+		543EB31C176B669F008D6580 /* DiffMatchPatch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 543EB31A176B669F008D6580 /* DiffMatchPatch.framework */; };
 		58CA2D1B1738B90F000D1612 /* sidebar_icon_add.png in Resources */ = {isa = PBXBuildFile; fileRef = 58CA2D191738B90F000D1612 /* sidebar_icon_add.png */; };
 		58CA2D1C1738B90F000D1612 /* sidebar_icon_add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 58CA2D1A1738B90F000D1612 /* sidebar_icon_add@2x.png */; };
 		5D1392A7157D4D92007D51B8 /* StatsWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D1392A6157D4D92007D51B8 /* StatsWebViewController.m */; };
@@ -1096,6 +1097,7 @@
 		45F285DA1149BD020014D36C /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		45F45B3411614BA50022D394 /* CPopoverManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPopoverManager.h; sourceTree = "<group>"; };
 		45F45B3511614BA50022D394 /* CPopoverManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPopoverManager.m; sourceTree = "<group>"; };
+		543EB31A176B669F008D6580 /* DiffMatchPatch.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DiffMatchPatch.framework; sourceTree = "<group>"; };
 		58CA2D191738B90F000D1612 /* sidebar_icon_add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sidebar_icon_add.png; sourceTree = "<group>"; };
 		58CA2D1A1738B90F000D1612 /* sidebar_icon_add@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sidebar_icon_add@2x.png"; sourceTree = "<group>"; };
 		5D1392A5157D4D92007D51B8 /* StatsWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatsWebViewController.h; sourceTree = "<group>"; };
@@ -1796,6 +1798,7 @@
 				E10B3664158F3B9500419A93 /* CrashReporter.framework in Frameworks */,
 				CCDCBC211590BF2A0040B3B1 /* libfacebook_ios_sdk.a in Frameworks */,
 				FEA64EDF0F7E4616BA835081 /* libPods.a in Frameworks */,
+				543EB31C176B669F008D6580 /* DiffMatchPatch.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1972,6 +1975,7 @@
 				E1A386C914DB05F700954CF8 /* CoreMedia.framework */,
 				E131CB5116CACA6B004B0314 /* CoreText.framework */,
 				E10B3663158F3B9500419A93 /* CrashReporter.framework */,
+				543EB319176B669F008D6580 /* DiffMatchPatch iOS5plus.embeddedframework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				FD3D6D2B1349F5D30061136A /* ImageIO.framework */,
 				FD21397E13128C5300099582 /* libiconv.dylib */,
@@ -2252,6 +2256,22 @@
 				4526DC541148072F0090C99D /* Default-Landscape.png */,
 			);
 			name = "Resources-iPad";
+			sourceTree = "<group>";
+		};
+		543EB319176B669F008D6580 /* DiffMatchPatch iOS5plus.embeddedframework */ = {
+			isa = PBXGroup;
+			children = (
+				543EB31A176B669F008D6580 /* DiffMatchPatch.framework */,
+				543EB31B176B669F008D6580 /* Resources */,
+			);
+			path = "DiffMatchPatch iOS5plus.embeddedframework";
+			sourceTree = "<group>";
+		};
+		543EB31B176B669F008D6580 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		5D27716D15A33A6200F4DCAA /* editing */ = {
@@ -4316,6 +4336,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/DiffMatchPatch iOS5plus.embeddedframework\"",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4351,6 +4372,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/DiffMatchPatch iOS5plus.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WordPress_Prefix.pch;
@@ -4408,6 +4430,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/DiffMatchPatch iOS5plus.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WordPress_Prefix.pch;
@@ -4463,6 +4486,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Classes\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/DiffMatchPatch iOS5plus.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = WordPress_Prefix.pch;
