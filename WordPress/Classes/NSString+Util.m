@@ -37,7 +37,7 @@
     NSMutableString *newString = [[NSMutableString alloc] initWithString:@""];
     
     for (Diff *diff in diffs) {
-        [newString appendString:diff.text];
+        [newString appendString:[NSString stringWithFormat:@"%@\n", diff.text]];
     }
     
     return newString;
